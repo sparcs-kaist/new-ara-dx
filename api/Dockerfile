@@ -7,25 +7,24 @@ RUN pip install --upgrade pip virtualenv awscli
 WORKDIR /tmp/newara/www
 RUN git clone https://github.com/sparcs-kaist/new-ara-api.git .
 
-ENV VIRTUAL_ENV=/tmp/newara/www/venv
-RUN virtualenv -p python3 $VIRTUAL_ENV
-ENV PATH_TMP=$PATH
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+# RUN virtualenv -p python3 /tmp/newara/www/venv
 
 # Copy other sources
 COPY ./.env .env
 COPY firebaseServiceAccountKey.json firebaseServiceAccountKey.json
 
-RUN pip install poetry
-RUN poetry config virtualenvs.create false
+#### Poetry commands
+RUN curl -sSL https://install.python-poetry.org | python3 -
+ENV PATH=/root/.local/bin:$PATH
+####
+RUN poetry config virtualenvs.in-project true
+
+# RUN poetry config cache-dir /root/api/cache-dir
 RUN mkdir -p /var/log/tmp/newara/
 
-EXPOSE 9000
-
 WORKDIR /root
-
 ENV VIRTUAL_ENV=/root/api/venv
-ENV PATH=$PATH_TMP
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+EXPOSE 9000
 ENTRYPOINT ["bash", "-c", " echo ====File move start====; mv -n /tmp/newara/www/* /tmp/newara/www/.* /root/api; echo ====File move done====; sleep infinity;"]
 # ENTRYPOINT bash
