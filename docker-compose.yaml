@@ -5,6 +5,7 @@ services:
     container_name: newara-front
     build: ./web
     restart: always
+    # entrypoint: 'sleep infinity' # for frontend editing
     ports:
      - '8080:8080'
 
@@ -20,7 +21,7 @@ services:
     ports:
       - 9000:9000
     volumes:
-      - ./newara:/root/api
+      - ./volumes/newara:/root/api
       - ./volumes/log:/var/log/newara
       - ./volumes/elastic:/newara/www/ara/db/elasticsearch
     networks:

@@ -7,7 +7,7 @@ RUN pip install --upgrade pip virtualenv awscli
 WORKDIR /tmp/newara/www
 RUN git clone https://github.com/sparcs-kaist/new-ara-api.git .
 RUN git fetch
-RUN git checkout -b origin/develop
+RUN git checkout -b develop origin/develop
 
 # RUN virtualenv -p python3 /tmp/newara/www/venv
 
