@@ -1,11 +1,11 @@
 # Build Project
-FROM node:14.9-alpine
+FROM node:14.9
 ARG WORKDIR
 
 WORKDIR /usr/src/app
 
 # Install build dependencies
-RUN apk add --no-cache --virtual .build-deps python build-base vim curl git
+RUN apt-get update && apt-get install python build-essential vim curl git -y
 
 RUN git clone https://github.com/sparcs-kaist/new-ara-web.git .
 
@@ -15,8 +15,8 @@ COPY .env .env
 # Install npm packages
 RUN npm install
 
-# Delete dependencies
-RUN apk del --purge .build-deps
+RUN git fetch
+RUN git checkout -b origin/dev
 
 EXPOSE 8080
 
