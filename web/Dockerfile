@@ -9,11 +9,11 @@ RUN apt-get update && apt-get install python build-essential vim curl git -y
 
 RUN git clone https://github.com/sparcs-kaist/new-ara-web.git .
 
-# Copy other sources
-COPY .env .env
-
 # Install npm packages
 RUN npm install
+
+# Copy other sources
+COPY ./.env .env
 
 RUN git fetch
 RUN git checkout dev
