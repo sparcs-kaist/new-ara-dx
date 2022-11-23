@@ -16,7 +16,7 @@ COPY .env .env
 RUN npm install
 
 RUN git fetch
-RUN git checkout -b dev origin/dev
+RUN git checkout dev
 
 EXPOSE 8080
 
