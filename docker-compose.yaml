@@ -12,6 +12,8 @@ services:
     container_name: newara
     build: ./api
     restart: always
+    stdin_open: true
+    tty: true
     depends_on:
       - redis
       - elasticsearch
@@ -19,8 +21,8 @@ services:
       - 9000:9000
     volumes:
       - ./newara:/root/api
-      - ./newara_log:/var/log/newara
-      - ./newara_elastic:/newara/www/ara/db/elasticsearch
+      - ./volumes/log:/var/log/newara
+      - ./volumes/elastic:/newara/www/ara/db/elasticsearch
     networks:
       - newara-network
 
@@ -36,7 +38,7 @@ services:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_general_ci
     volumes:
-      - ./ara_volume:/var/lib/mysql
+      - ./volumes/db:/var/lib/mysql
     networks:
       - newara-network
 
@@ -55,7 +57,7 @@ services:
     environment:
       - discovery.type=single-node
     volumes:
-      - ./newara/db/elasticsearch/synonym.txt:/usr/share/elasticsearch/config/analysis/synonym.txt
+      # - ./volumes/db/elasticsearch/synonym.txt:/usr/share/elasticsearch/config/analysis/synonym.txt
       - esdata:/usr/share/elasticsearch/data
     networks:
       - newara-network
