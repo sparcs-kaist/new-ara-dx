@@ -14,7 +14,6 @@ RUN npm install
 
 # Copy other sources
 COPY ./.env .env
-
 RUN git fetch
 RUN git checkout dev
 
@@ -22,4 +21,5 @@ EXPOSE 8080
 
 # TODO: allow to edit like backend
 # change alpine to normal
-ENTRYPOINT ["npm", "run", "serve"]
+ENTRYPOINT ["bash", "-c", "git pull; npm run swenv; npm run serve"]
+

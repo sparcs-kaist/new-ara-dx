@@ -5,7 +5,7 @@ services:
     container_name: newara-front
     build: ./web
     restart: always
-    # entrypoint: 'sleep infinity' # for frontend editing
+    entrypoint: 'sleep infinity' # for frontend editing
     ports:
      - '8080:8080'
 
@@ -29,7 +29,7 @@ services:
 
 
   db:
-    image: mysql:8.0
+    image: mysql:5.7
     ports:
       - 3306:3306
     environment:
@@ -62,10 +62,8 @@ services:
       - esdata:/usr/share/elasticsearch/data
     networks:
       - newara-network
-
 volumes:
   esdata:
-  mysqldata:
 
 networks:
   newara-network:
