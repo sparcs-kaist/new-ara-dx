@@ -3,7 +3,7 @@ echo ====File move start====;
 if ! [ "$(ls -A /root/api/apps)" ]; then
     echo Directory is empty: copy src, run initialize
     git clone https://github.com/sparcs-kaist/new-ara-api.git /root/api/.
-    cat /tmp/env/firebaseServiceAccountKey.json >> /root/api/firebaseServiceAccountKey.json;
+    cat /tmp/env/firebaseServiceAccountKey.json > /root/api/firebaseServiceAccountKey.json;
     git fetch;
     git checkout develop;
     poetry install;
@@ -20,7 +20,7 @@ if ! [ "$(ls -A /root/api/apps)" ]; then
     echo 'set \-a; source .env; set +a; source .venv/bin/activate;' > /root/api/activate
  fi
 
-echo '######WARNING: This is temporal file######' >> /root/api/.env;
+echo '######WARNING: This is temporal file######' > /root/api/.env;
 cat /tmp/env/.env >> /root/api/.env;
 echo ====File move done====;
 
