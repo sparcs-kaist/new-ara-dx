@@ -1,69 +1,17 @@
 version: '3'
 
 services:
-  web:
-    container_name: newara-front
-    build: ./web
-    restart: always
-    entrypoint: 'sleep infinity' # for frontend editing
+  nginx:
+    image: nginx
+    container_name: nginx-dx
     ports:
-     - '8080:8080'
-
-  api:
-    container_name: newara
-    build: ./api
-    restart: always
-    stdin_open: true
-    tty: true
-    depends_on:
-      - redis
-      - elasticsearch
-    ports:
-      - 9000:9000
+      - 32132:80
+    # docker exec nginx-dx nginx -s reload
     volumes:
-      - ./volumes/newara:/root/api
-      - ./volumes/log:/var/log/newara
-      - ./volumes/elastic:/newara/www/ara/db/elasticsearch
+      - ./nginx:/etc/nginx/conf.d
     networks:
       - newara-network
-
-
-  db:
-    image: mysql:5.7
-    ports:
-      - 3306:3306
-    environment:
-      - MYSQL_ROOT_PASSWORD=supereasypassw0rd
-      - MYSQL_DATABASE=new_ara
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_general_ci
-    volumes:
-      - ./volumes/db:/var/lib/mysql
-    networks:
-      - newara-network
-
-  redis:
-    image: redis:6
-    ports:
-      - 6379:6379
-    networks:
-      - newara-network
-
-  elasticsearch:
-    image: elasticsearch:7.9.2
-    ports:
-      - 9200:9200
-      - 9300:9300
-    environment:
-      - discovery.type=single-node
-    volumes:
-      # - ./volumes/db/elasticsearch/synonym.txt:/usr/share/elasticsearch/config/analysis/synonym.txt
-      - esdata:/usr/share/elasticsearch/data
-    networks:
-      - newara-network
-volumes:
-  esdata:
 
 networks:
   newara-network:
+    name: newara-network

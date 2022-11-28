@@ -12,14 +12,13 @@ RUN git clone https://github.com/sparcs-kaist/new-ara-web.git .
 # Install npm packages
 RUN npm install
 
-# Copy other sources
-COPY ./.env .env
-RUN git fetch
-RUN git checkout dev
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod u+x /docker-entrypoint.sh
 
 EXPOSE 8080
 
 # TODO: allow to edit like backend
 # change alpine to normal
-ENTRYPOINT ["bash", "-c", "git pull; npm run swenv; npm run serve"]
+
+ENTRYPOINT ["bash", "-c", "/docker-entrypoint.sh"]
 

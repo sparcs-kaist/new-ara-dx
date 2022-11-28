@@ -1,11 +1,14 @@
 echo ====File move start====;
-mv /tmp/newara/firebaseServiceAccountKey.json /root/api;
+# move credentials to container
 if ! [ "$(ls -A /root/api/apps)" ]; then
     echo Directory is empty: copy src, run initialize
-    mv -n /tmp/newara/www/* /tmp/newara/www/.* /root/api;
+    git clone https://github.com/sparcs-kaist/new-ara-api.git /root/api/.
+    cat /tmp/env/firebaseServiceAccountKey.json >> /root/api/firebaseServiceAccountKey.json;
+    git fetch;
+    git checkout develop;
     poetry install;
     set -a;
-    source /tmp/newara/.env;
+    source /tmp/env/.env;
     set +a;
     source /root/api/.venv/bin/activate;
     while ! nc -vz $NEWARA_DB_HOST $NEWARA_DB_PORT; do
@@ -13,12 +16,12 @@ if ! [ "$(ls -A /root/api/apps)" ]; then
 	sleep 1
     done
     make migrate;
+    # if all tasks done, then create .env so that allow to do make run 
     echo 'set \-a; source .env; set +a; source .venv/bin/activate;' > /root/api/activate
  fi
 
-# if all tasks done, then create .env so that mllow to do make run 
-mv /tmp/newara/.env /root/api;
-
+echo '######WARNING: This is temporal file######' >> /root/api/.env;
+cat /tmp/env/.env >> /root/api/.env;
 echo ====File move done====;
 
 sleep infinity;

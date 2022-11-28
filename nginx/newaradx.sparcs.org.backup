@@ -1,0 +1,28 @@
+# run below command and add a server's nginx conf
+# sudo certbot certonly --manual -d *.newaradx.sparcs.org --preferred-challenges dns
+# before press the enter, enter TXT record to _acme_challenges in route53.
+
+server {
+        server_name *.newaradx.sparcs.org;
+        listen 443 ssl;
+        listen [::]:443 ssl;
+
+        ssl_certificate /etc/letsencrypt/live/newaradx.sparcs.org/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/newaradx.sparcs.org/privkey.pem;
+
+        location / {
+                include snippet/proxy.conf;
+                proxy_pass http://localhost:32132;
+        }
+}
+
+
+server{
+        listen 80;
+        listen [::]:80;
+        server_name *.newaradx.sparcs.org;
+
+        location / {
+               return 301 https://$host$request_uri;
+        }
+}

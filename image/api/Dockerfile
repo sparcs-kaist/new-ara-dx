@@ -11,15 +11,9 @@ RUN curl -sSL https://install.python-poetry.org | python3 -
 ENV PATH=/root/.local/bin:$PATH
 RUN poetry config virtualenvs.in-project true
 
-RUN git clone https://github.com/sparcs-kaist/new-ara-api.git .
-RUN git fetch
-RUN git checkout develop
-
 # RUN virtualenv -p python3 /tmp/newara/www/venv
 
 # Copy other sources
-COPY ./.env /tmp/newara/.env
-COPY firebaseServiceAccountKey.json /tmp/newara/firebaseServiceAccountKey.json
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod u+x /docker-entrypoint.sh
 
