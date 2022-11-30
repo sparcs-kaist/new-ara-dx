@@ -19,9 +19,9 @@ services:
       - redis
       - elasticsearch
     volumes:
-      - ./volumes/newara:/root/api
+      - ./volumes/root:/root
       - ./volumes/log:/var/log/newara
-      - ./volumes/elastic:/newara/www/ara/db/elasticsearch
+      - ./volumes/elastic-api:/newara/www/ara/db/elasticsearch
       - ./api/firebaseServiceAccountKey.json:/tmp/env/firebaseServiceAccountKey.json
       - ./api/.env:/tmp/env/.env
     networks:
@@ -52,7 +52,7 @@ services:
     environment:
       - discovery.type=single-node
     volumes:
-      # - ./volumes/db/elasticsearch/synonym.txt:/usr/share/elasticsearch/config/analysis/synonym.txt
+      - ./volumes/elastic-db/synonym.txt:/usr/share/elasticsearch/config/analysis/synonym.txt
       - esdata:/usr/share/elasticsearch/data
     networks:
       - newara-network

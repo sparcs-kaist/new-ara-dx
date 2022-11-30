@@ -2,6 +2,7 @@ echo ====File move start====;
 # move credentials to container
 if ! [ "$(ls -A /root/api/apps)" ]; then
     echo Directory is empty: copy src, run initialize
+    cp -a /tmp/newara/www/root/. /root/
     git clone https://github.com/sparcs-kaist/new-ara-api.git /root/api/.
     cat /tmp/env/firebaseServiceAccountKey.json > /root/api/firebaseServiceAccountKey.json;
     git fetch;
@@ -16,12 +17,16 @@ if ! [ "$(ls -A /root/api/apps)" ]; then
 	sleep 1
     done
     make migrate;
-    # if all tasks done, then create .env so that allow to do make run 
+    # if all tasks done, then create .env so that allow to do make run
+    echo -e "\n"|ssh-keygen -t rsa -N ""
+    touch /root/.ssh/authorized_keys
+    cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
     echo 'set \-a; source .env; set +a; source .venv/bin/activate;' > /root/api/activate
  fi
 
 echo '######WARNING: This is temporal file######' > /root/api/.env;
 cat /tmp/env/.env >> /root/api/.env;
+service ssh start;
 echo ====File move done====;
 
 sleep infinity;

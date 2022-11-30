@@ -1,6 +1,6 @@
 FROM python:3.8
 
-RUN apt-get update && apt-get install netcat-openbsd supervisor gettext git vim curl default-mysql-client -y
+RUN apt-get update && apt-get install netcat-openbsd supervisor gettext git vim curl default-mysql-client htop nano openssh-server zsh -y
 
 RUN pip install --upgrade pip virtualenv awscli
 
@@ -11,13 +11,16 @@ RUN curl -sSL https://install.python-poetry.org | python3 -
 ENV PATH=/root/.local/bin:$PATH
 RUN poetry config virtualenvs.in-project true
 
-# RUN virtualenv -p python3 /tmp/newara/www/venv
+RUN curl -L https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh | sh
+RUN chsh -s `which zsh`
 
-# Copy other sources
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod u+x /docker-entrypoint.sh
 
 RUN mkdir -p /var/log/tmp/newara/
+
+# Copy all in /root
+RUN cp -a /root .
 
 WORKDIR /root/api
 EXPOSE 9000
