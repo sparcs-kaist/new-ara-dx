@@ -52,7 +52,7 @@ services:
     environment:
       - discovery.type=single-node
     volumes:
-      - ./volumes/elastic-db/synonym.txt:/usr/share/elasticsearch/config/analysis/synonym.txt
+      - ./volumes/root/api/ara/db/elasticsearch/synonym.txt:/usr/share/elasticsearch/config/analysis/synonym.txt
       - esdata:/usr/share/elasticsearch/data
     networks:
       - newara-network

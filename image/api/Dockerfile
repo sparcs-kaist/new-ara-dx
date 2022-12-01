@@ -14,17 +14,16 @@ RUN poetry config virtualenvs.in-project true
 RUN curl -L https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh | sh
 RUN chsh -s `which zsh`
 
-COPY docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod u+x /docker-entrypoint.sh
-
 RUN mkdir -p /var/log/tmp/newara/
 
 # Copy all in /root
 RUN cp -a /root .
 
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod u+x /docker-entrypoint.sh
+
 WORKDIR /root/api
 EXPOSE 9000
-
 # ENTRYPOINT bash
 ENTRYPOINT ["bash", "-c", "/docker-entrypoint.sh"]
 
