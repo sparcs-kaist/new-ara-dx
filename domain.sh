@@ -17,7 +17,8 @@ if [ "$1" = "on" ]; then
 				server_name $2.newaradx.sparcs.org;
 				listen 80;
 				listen [::]:80;
-
+				recursive_error_pages   on;
+				proxy_ssl_server_name on;
 
 				location / {
 					# Default headers
@@ -48,6 +49,12 @@ if [ "$1" = "on" ]; then
 					}
 
 				}
+
+				error_page 502 /502;
+				location = /502 {
+					proxy_pass https://http.cat/502;
+				}
+
 			}
 			EOF
 			

@@ -1,5 +1,5 @@
 docker compose exec api cat /root/.ssh/id_rsa
-docker compose ps -a | awk -v RS="" '{match($0, /.*\n.*:([0-9]*).*\n.*:([0-9]*).*/, m); print "DB Port: " m[1] "\nSSH Port: " m[2]}'
+docker compose ps -a | awk -v RS="" '{match($0, /.*\n.*:([0-9]*).*\n.*:([0-9]*).*/, m); print "SSH Port: " m[1] "\nDB Port: " m[2]}'
 
 echo ""
 echo "####################YOU MUST DO BELOW TASK#####################"
