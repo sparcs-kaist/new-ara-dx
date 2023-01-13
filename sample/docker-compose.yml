@@ -4,11 +4,12 @@ services:
   web:
     image: newara-dx/web
     restart: always
-      # entrypoint: 'bash /docker-entrypoint.sh sleep' # enable for frontend editing
     networks:
      - newara-network
     volumes:
       - ./web/.env:/tmp/env/.env
+      - web-volume:/usr/src/app
+      - ssh-volume:/root/.ssh
        
   api:
     image: newara-dx/api
@@ -24,6 +25,8 @@ services:
       - ./volumes/elastic-api:/newara/www/ara/db/elasticsearch
       - ./api/firebaseServiceAccountKey.json:/tmp/env/firebaseServiceAccountKey.json
       - ./api/.env:/tmp/env/.env
+      - web-volume:/root/web
+      - ssh-volume:/root/.ssh
     networks:
       - newara-network
 
@@ -60,6 +63,8 @@ services:
 
 volumes:
   esdata:
+  web-volume:
+  ssh-volume:
 
 networks:
   newara-network:

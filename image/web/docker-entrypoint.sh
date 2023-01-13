@@ -5,6 +5,9 @@ npm run swenv;
 if [ "$1" = "sleep" ]; then
 	sleep infinity;
 else
+	service ssh start;
 	git pull;
-	npm run serve;
+	npm install; # For new version of dev branch, it may requires new package.
+	npm run serve; # It may killed by api container.
+	sleep infinity;
 fi

@@ -5,7 +5,7 @@ ARG WORKDIR
 WORKDIR /usr/src/app
 
 # Install build dependencies
-RUN apt-get update && apt-get install python build-essential vim curl git -y
+RUN apt-get update && apt-get install python build-essential vim curl git openssh-server -y
 
 RUN git clone https://github.com/sparcs-kaist/new-ara-web.git .
 
