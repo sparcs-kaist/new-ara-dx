@@ -3,10 +3,10 @@ version: '3'
 services:
   nginx:
     image: nginx
-    container_name: nginx-dx
+    container_name: newara-nginx
     ports:
       - 32132:80
-    # docker exec nginx-dx nginx -s reload
+    # docker exec newara-nginx nginx -s reload
     volumes:
       - ./nginx:/etc/nginx/conf.d
     networks:

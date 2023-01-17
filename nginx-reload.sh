@@ -1,1 +1,1 @@
-docker exec nginx-dx nginx -s reload
+docker exec newara-nginx nginx -s reload

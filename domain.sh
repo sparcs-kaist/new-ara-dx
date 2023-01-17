@@ -5,7 +5,7 @@ if [ "$1" = "on" ]; then
 		echo "Already enabled";
 	elif [ -f "nginx/$2.conf.old" ]; then
 		mv nginx/$2.conf.old nginx/$2.conf;
-		docker exec nginx-dx nginx -s reload &&
+		docker exec newara-nginx nginx -s reload &&
 		echo "Successfully enabled domain $2.newaradx.sparcs.org" ||
 		mv nginx/$2.conf nginx/$2.conf.old;
 	else
@@ -36,12 +36,12 @@ if [ "$1" = "on" ]; then
 
 					# Send to Frontend
 					location / {
-						proxy_pass http://$2-web-1:8080;
+						proxy_pass http://$2-newara-web-1:8080;
 					}
 
 					# Send to Backend
 					location /api {
-						proxy_pass http://$2-api-1:9000;
+						proxy_pass http://$2-newara-api-1:9000;
 					}
 
 					location /robots.txt {
@@ -59,7 +59,7 @@ if [ "$1" = "on" ]; then
 			EOF
 			
 			mv nginx/$2.conf.old nginx/$2.conf;
-			docker exec nginx-dx nginx -s reload &&
+			docker exec newara-nginx nginx -s reload &&
 			echo "Successfully enabled domain $2.newaradx.sparcs.org" ||
 			mv nginx/$2.conf nginx/$2.conf.old;
 		fi
@@ -67,7 +67,7 @@ if [ "$1" = "on" ]; then
 elif [ "$1" = "off" ]; then
 	if [ -f "nginx/$2.conf" ]; then
 		mv nginx/$2.conf nginx/$2.conf.old;
-		docker exec nginx-dx nginx -s reload &&
+		docker exec newara-nginx nginx -s reload &&
 		echo "Successfully disabled domain $2.newaradx.sparcs.org" ||
 		mv nginx/$2.conf.old nginx/$2.conf;
 	elif [ -f "nginx/$2.conf.old" ]; then

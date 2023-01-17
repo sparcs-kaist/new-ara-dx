@@ -1,36 +1,36 @@
 version: '3'
 
 services:
-  web:
+  newara-web:
     image: newara-dx/web
     restart: always
     networks:
      - newara-network
     volumes:
       - ./web/.env:/tmp/env/.env
-      - web-volume:/usr/src/app
-      - ssh-volume:/root/.ssh
+      - newara-web:/usr/src/app
+      - newara-ssh:/root/.ssh
        
-  api:
+  newara-api:
     image: newara-dx/api
     restart: always
     ports:
       - 22
     depends_on:
-      - redis
-      - elasticsearch
+      - newara-redis
+      - newara-elasticsearch
     volumes:
       - ./volumes/root:/root
       - ./volumes/log:/var/log/newara
       - ./volumes/elastic-api:/newara/www/ara/db/elasticsearch
       - ./api/firebaseServiceAccountKey.json:/tmp/env/firebaseServiceAccountKey.json
       - ./api/.env:/tmp/env/.env
-      - web-volume:/root/web
-      - ssh-volume:/root/.ssh
+      - newara-web:/root/web
+      - newara-ssh:/root/.ssh
     networks:
       - newara-network
 
-  db:
+  newara-db:
     image: mysql:5.7
     ports:
       - 3306
@@ -45,26 +45,26 @@ services:
     networks:
       - newara-network
 
-  redis:
+  newara-redis:
     image: redis:6
     networks:
       - newara-network
 
-  elasticsearch:
+  newara-elasticsearch:
     image: elasticsearch:7.9.2
     environment:
       - discovery.type=single-node
     volumes:
       - ./volumes/root/api/ara/db/elasticsearch/synonym.txt:/usr/share/elasticsearch/config/analysis/synonym.txt
-      - esdata:/usr/share/elasticsearch/data
+      - newara-esdata:/usr/share/elasticsearch/data
     networks:
       - newara-network
         
 
 volumes:
-  esdata:
-  web-volume:
-  ssh-volume:
+  newara-esdata:
+  newara-web:
+  newara-ssh:
 
 networks:
   newara-network:

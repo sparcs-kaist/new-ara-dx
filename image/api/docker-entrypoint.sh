@@ -26,7 +26,7 @@ if ! [ "$(ls -A /root/api/apps)" ]; then
     echo -e "\n"|ssh-keygen -t rsa -N ""
     touch /root/.ssh/authorized_keys
     cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
-    echo 'set \-a; source .env; set +a; source .venv/bin/activate;' > /root/api/activate
+    echo 'set \-a; source /root/api/.env; set +a; source /root/api/.venv/bin/activate;' >> /root/.zshrc
  fi
 
 echo '######WARNING: This is temporal file######' > /root/api/.env;
