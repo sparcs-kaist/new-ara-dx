@@ -1,4 +1,4 @@
-# run below command and add a server's nginx conf
+# run below command and add a server's nginx conf into /etc/sites-available (+ link to sites-enable)
 # sudo certbot certonly --manual -d *.newaradx.sparcs.org --preferred-challenges dns
 # before press the enter, enter TXT record to _acme_challenges in route53.
 

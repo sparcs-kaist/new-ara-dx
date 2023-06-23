@@ -1,0 +1,79 @@
+version: "3"
+
+services:
+  # frontend-static (nginx based)
+  # if you want to modify frontend code (or you are frontend developer)
+  # disable `ports` in web, and enable `ports` in web-dev
+  web:
+    container_name: ara-web
+    build: web
+    restart: always
+    ports:
+    - "80:80"
+
+  # frontend-dev (nodejs based)
+  web-dev:
+    container_name: ara-web-dev
+    build: web-dev
+    env_file: web-dev/.env
+    restart: always
+    volumes:
+    - vol-web-dev-root:/root
+    - vol-web-dev:/usr/src/app
+    # ports:
+    # - "80:8080"
+
+  api:
+    container_name: ara-api
+    build: api
+    restart: always
+    depends_on:
+      - db
+      - redis
+    ports:
+      - "9000:9000"
+    env_file: api/.env
+    entrypoint: bash .docker/run.sh dx
+    volumes:
+      - /root/ara/log:/var/log/newara
+      - vol-api-root:/root
+      - vol-api:/newara/www
+
+  db:
+    container_name: ara-db
+    image: mysql:8
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=supereasypassword
+      - MYSQL_DATABASE=new_ara
+    volumes:
+      - vol-db:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  redis:
+    container_name: ara-redis
+    image: redis:6
+    restart: always
+    volumes:
+      - vol-redis:/data
+
+  elasticsearch:
+    container_name: ara-es
+    image: elasticsearch:7.9.2
+    restart: always
+    environment:
+      - discovery.type=single-node
+    volumes:
+      - ./es/synonym.txt:/usr/share/elasticsearch/config/analysis/synonym.txt
+      - vol-esdata:/usr/share/elasticsearch/data
+
+volumes:
+  vol-api:
+  vol-web-dev:
+  vol-api-root:
+  vol-web-dev-root:
+  vol-db:
+  vol-redis:
+  vol-esdata:
