@@ -1,3 +1,7 @@
 *.env
 firebaseServiceAccountKey.json
+
+# docker-compose.yaml: hide .yaml, but show .yml
+# because root docker-compose has credeitals (SSO)
+docker-compose.yaml
 volume

@@ -1,0 +1,52 @@
+# Execute via `dc up -d --build` (include build so that automatically build image if dind-contents changes)
+version: '3'
+
+services:
+  domainrouter:
+    build: nginx
+    ports:
+      - 32132:80
+    environment:
+      - NICKNAMES=triangle,yuwol
+  
+  dind-triangle:
+    build: dx2.0
+    privileged: true
+    env_file: .shared.env
+    # Change Below per user
+    hostname: triangle-dx
+    ports: # 외부 접근 허용 포트 절대 사용 금지 (휠 채널 포트 안내 스레드 참고)
+    - 39234:22
+    - 39235:3306
+    environment:
+    # - DISABLE_INIT_DC_UP=true
+    - NICKNAME=triangle
+    - SSO_CLIENT_ID=
+    - SSO_SECRET_KEY=
+    volumes:
+    - triangle-root:/root
+    - triangle-docker:/var/lib/docker
+
+  dind-yuwol:
+    build: dx2.0
+    privileged: true
+    env_file: .shared.env
+    # Change Below per user
+    hostname: yuwol-dx
+    ports: # 외부 접근 허용 포트 절대 사용 금지 (휠 채널 포트 안내 스레드 참고)
+    - 40000:22
+    - 40001:3306
+    environment:
+    # - DISABLE_INIT_DC_UP=true
+    - NICKNAME=yuwol
+    - SSO_CLIENT_ID=
+    - SSO_SECRET_KEY=
+    volumes:
+    - yuwol-root:/root
+    - yuwol-docker:/var/lib/docker
+
+volumes:
+  triangle-root:
+  triangle-docker:
+  yuwol-root:
+  yuwol-docker:
