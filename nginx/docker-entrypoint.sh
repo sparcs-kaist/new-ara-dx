@@ -39,6 +39,10 @@ for nickname in $nicknames; do
                 proxy_pass http://dind-$nickname:9000;
             }
 
+            location /swagger {
+                proxy_pass http://dind-$nickname:9000;
+            }
+
             location /robots.txt {
                 return 200 "User-agent: *\\nDisallow: /\\n";
             }
