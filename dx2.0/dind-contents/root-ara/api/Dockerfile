@@ -6,6 +6,9 @@ RUN apt-get update && apt-get install netcat-openbsd supervisor gettext git vim 
 RUN curl -L https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh | sh
 RUN chsh -s `which zsh`
 
+RUN pipenv install --dev
+# RUN echo 'eval "$(pipenv shell)"' >> /root/.zshrc
+
 # enable git into existing folder
 RUN git clone -b develop https://github.com/sparcs-kaist/new-ara-api.git tmp_repo
 RUN mv tmp_repo/.git .
