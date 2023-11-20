@@ -19,4 +19,6 @@ WORKDIR /root/web
 RUN npm install
 
 EXPOSE 8080
-ENTRYPOINT ["sleep", "infinity"]
+RUN apt-get install dumb-init -y
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+CMD ["sleep", "infinity"]
