@@ -132,6 +132,10 @@ def renew_cert() -> int:
     _PROCESS.communicate(input="\n".encode("utf-8"))
     return _PROCESS.wait()
 
+def reload_nginx() -> int:
+    command = _command("systemctl reload nginx")
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    return process.wait()
 
 if __name__ == "__main__":
     _check_platform()
@@ -139,7 +143,34 @@ if __name__ == "__main__":
     if not BOTO3: install_boto3()
     _get_env()
     try:
-        renew_cert()
+        if renew_cert():
+            print("Failed to renew certificate.")
+            
+            output = _PROCESS.stdout.readline().decode("utf-8")
+            while output:
+                print(output)
+                output = _PROCESS.stdout.readline().decode("utf-8")
+            
+            output = _PROCESS.stderr.readline().decode("utf-8")
+            while output:
+                print(output)
+                output = _PROCESS.stderr.readline().decode("utf-8")
+            
+            exit(4)
+        else:
+            print("Certificate renewed successfully.")
+            yn = input("Do you want to reload nginx? (y/n) ")
+            if yn.lower() == "y":
+                if reload_nginx():
+                    print("Failed to reload nginx.")
+                    output = _PROCESS.stdout.readline().decode("utf-8")
+                    while output:
+                        print(output)
+                        output = _PROCESS.stdout.readline().decode("utf-8")
+                    exit(5)
+                else:
+                    print("Nginx reloaded successfully.")
+
     except KeyboardInterrupt:
         if isinstance(_PROCESS, subprocess.Popen):
             _PROCESS.send_signal(signal.SIGINT)
