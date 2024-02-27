@@ -83,12 +83,7 @@ def update_route53(acme_domain:str, value: str) -> None:
         raise ValueError(f"Zone not found: {level2_dns}")
     
     hostedzone = zones["Id"].split("/")[-1]
-    old_records = client.list_resource_record_sets(HostedZoneId=hostedzone, StartRecordName=acme_domain, StartRecordType="TXT")["ResourceRecordSets"]
     changes = {"Changes": []}
-    if len(old_records) > 0:
-        old_record = old_records[0]
-        if old_record["Name"] == f"{acme_domain}." and old_record["Type"] == "TXT":
-            changes["Changes"].append({"Action": "DELETE", "ResourceRecordSet": old_record})
     
     changes["Changes"].append({
         "Action": "UPSERT",
