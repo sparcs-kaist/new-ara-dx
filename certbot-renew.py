@@ -84,11 +84,14 @@ def update_route53(acme_domain:str, value: str) -> None:
     
     hostedzone = zones["Id"].split("/")[-1]
     changes = {"Changes": []}
+
+    if not acme_domain.endswith("."):
+        acme_domain = f"{acme_domain}."
     
     changes["Changes"].append({
         "Action": "UPSERT",
         "ResourceRecordSet": {
-            "Name": f"{acme_domain}.",
+            "Name": acme_domain,
             "Type": "TXT",
             "TTL": 300,
             "ResourceRecords": [{"Value": f'"{value}"'}]
