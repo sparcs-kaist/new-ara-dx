@@ -28,7 +28,7 @@ def _command(command: str) -> str:
 
 def _get_env() -> None:
     global AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN, RENEW_DNS, EMAIL
-    required_envs = ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS", "AWS_SESSION_TOKEN", "RENEW_DNS", "EMAIL"]
+    required_envs = ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_SESSION_TOKEN", "RENEW_DNS", "EMAIL"]
     missing_envs = []
 
     if _ENV_PATH.exists():
@@ -120,7 +120,7 @@ def renew_cert() -> int:
     print("Does value show clearly? (y/n)")
     yn = input("> ")
     if yn.lower() == "y":
-        update_route53()
+        update_route53(acme_domain, acme_value)
     else:
         print("Please re-run this script.")
         _PROCESS.send_signal(signal.SIGINT)
