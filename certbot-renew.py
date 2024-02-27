@@ -36,8 +36,8 @@ def _get_env() -> None:
         for line in environ_raw:
             if line and not line.startswith("#"):
                 line = line.split("=")
-                if line.startswith("\""): line = line[1:]
-                if line.endswith("\""): line = line[:-1]
+                if line[1].startswith("\""): line[1] = line[1][1:]
+                if line[1].endswith("\""): line[1] = line[1][:-1]
                 globals()[line[0]] = "=".join(line[1:])
     
     for env in required_envs:
