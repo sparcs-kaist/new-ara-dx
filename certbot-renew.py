@@ -89,7 +89,7 @@ def update_route53(acme_domain:str, value: str) -> None:
             changes["Changes"].append({"Action": "DELETE", "ResourceRecordSet": old_record})
     
     changes["Changes"].append({
-        "Action": "CREATE",
+        "Action": "UPSERT",
         "ResourceRecordSet": {
             "Name": f"{acme_domain}.",
             "Type": "TXT",
