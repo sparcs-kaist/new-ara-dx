@@ -64,9 +64,7 @@ def _check_admin_privileges() -> None:
         raise PermissionError("You need to have admin privileges to run this script")
 
 def has_certbot():
-    command = _command("certbot --version")
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    return process.wait() == 0
+    return not os.system("command -v certbot > /dev/null")
 
 def install_boto3() -> None:
     command = _command("su - -c 'python3 -m pip install boto3'")
