@@ -29,6 +29,7 @@ def _command(command: str) -> str:
 def _get_env() -> None:
     global AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN, RENEW_DNS, EMAIL
     required_envs = ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_SESSION_TOKEN", "RENEW_DNS", "EMAIL"]
+    allowed_missing_envs = ["AWS_SESSION_TOKEN"]
     missing_envs = []
 
     if _ENV_PATH.exists():
@@ -43,7 +44,7 @@ def _get_env() -> None:
     for env in required_envs:
         if not globals()[env]:
             globals()[env] = os.environ.get(env, "")
-            if not globals()[env]:
+            if not globals()[env] and env not in allowed_missing_envs:
                 missing_envs.append(env)
 
     if missing_envs:
