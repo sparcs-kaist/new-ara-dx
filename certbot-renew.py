@@ -133,6 +133,7 @@ def renew_cert() -> int:
         _PROCESS.wait()
         exit(3)
 
+    print("Please wait for DNS to update globally...")
     update = False
     while not update:
         time.sleep(2)
