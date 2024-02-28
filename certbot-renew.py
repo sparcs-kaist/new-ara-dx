@@ -2,6 +2,7 @@
 
 import os
 import signal
+import time
 import platform
 import subprocess
 from pathlib import Path
@@ -16,19 +17,24 @@ SUDO = ""
 _SUPPORTED_PLATFORMS = ["linux"]
 _PROCESS: subprocess.Popen = None
 _ENV_PATH = Path(".certbot.env")
+_INSTALL = []
 
 try:
     import boto3
-    BOTO3 = True
 except ImportError:
-    BOTO3 = False
+    _INSTALL.append("boto3")
+try:
+    import requests
+except ImportError:
+    _INSTALL.append("requests")
 
 def _command(command: str) -> str:
     return SUDO+command
 
 def _get_env() -> None:
     global AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN, RENEW_DNS, EMAIL
-    required_envs = ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS", "AWS_SESSION_TOKEN", "RENEW_DNS", "EMAIL"]
+    required_envs = ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_SESSION_TOKEN", "RENEW_DNS", "EMAIL"]
+    allowed_missing_envs = ["AWS_SESSION_TOKEN"]
     missing_envs = []
 
     if _ENV_PATH.exists():
@@ -36,12 +42,14 @@ def _get_env() -> None:
         for line in environ_raw:
             if line and not line.startswith("#"):
                 line = line.split("=")
+                if line[1].startswith("\""): line[1] = line[1][1:]
+                if line[1].endswith("\""): line[1] = line[1][:-1]
                 globals()[line[0]] = "=".join(line[1:])
     
     for env in required_envs:
         if not globals()[env]:
             globals()[env] = os.environ.get(env, "")
-            if not globals()[env]:
+            if not globals()[env] and env not in allowed_missing_envs:
                 missing_envs.append(env)
 
     if missing_envs:
@@ -64,12 +72,10 @@ def _check_admin_privileges() -> None:
         raise PermissionError("You need to have admin privileges to run this script")
 
 def has_certbot():
-    command = _command("certbot --version")
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    return process.wait() == 0
+    return not os.system("command -v certbot > /dev/null")
 
-def install_boto3() -> None:
-    command = _command("su - -c 'python3 -m pip install boto3'")
+def install_package(packages: list) -> None:
+    command = _command(f"su - -c 'python3 -m pip install {' '.join(packages)}'")
     os.system(command)
     print("Please restart this script.")
     exit(2)
@@ -83,17 +89,15 @@ def update_route53(acme_domain:str, value: str) -> None:
         raise ValueError(f"Zone not found: {level2_dns}")
     
     hostedzone = zones["Id"].split("/")[-1]
-    old_records = client.list_resource_record_sets(HostedZoneId=hostedzone, StartRecordName=acme_domain, StartRecordType="TXT")["ResourceRecordSets"]
     changes = {"Changes": []}
-    if len(old_records) > 0:
-        old_record = old_records[0]
-        if old_record["Name"] == f"{acme_domain}." and old_record["Type"] == "TXT":
-            changes["Changes"].append({"Action": "DELETE", "ResourceRecordSet": old_record})
+
+    if not acme_domain.endswith("."):
+        acme_domain = f"{acme_domain}."
     
     changes["Changes"].append({
-        "Action": "CREATE",
+        "Action": "UPSERT",
         "ResourceRecordSet": {
-            "Name": f"{acme_domain}.",
+            "Name": acme_domain,
             "Type": "TXT",
             "TTL": 300,
             "ResourceRecords": [{"Value": f'"{value}"'}]
@@ -122,12 +126,26 @@ def renew_cert() -> int:
     print("Does value show clearly? (y/n)")
     yn = input("> ")
     if yn.lower() == "y":
-        update_route53()
+        update_route53(acme_domain, acme_value)
     else:
         print("Please re-run this script.")
         _PROCESS.send_signal(signal.SIGINT)
         _PROCESS.wait()
         exit(3)
+
+    print("Please wait for DNS to update globally...")
+    update = False
+    while not update:
+        time.sleep(2)
+        rtn = requests.get(f"https://toolbox.googleapps.com/apps/dig/lookup?domain={acme_domain[:-1]}&typ=TXT").json()
+        try:
+            value = rtn["json_response"]["ANSWER"][0]["answer"][0]["value"][0]
+            if value == acme_value:
+                update = True
+        except KeyError:
+            pass
+        except IndexError:
+            pass
 
     _PROCESS.communicate(input="\n".encode("utf-8"))
     return _PROCESS.wait()
@@ -140,7 +158,7 @@ def reload_nginx() -> int:
 if __name__ == "__main__":
     _check_platform()
     _check_admin_privileges()
-    if not BOTO3: install_boto3()
+    if _INSTALL: install_package(_INSTALL)
     _get_env()
     try:
         if renew_cert():
