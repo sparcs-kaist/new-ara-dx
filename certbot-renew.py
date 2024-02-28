@@ -2,6 +2,7 @@
 
 import os
 import signal
+import time
 import platform
 import subprocess
 from pathlib import Path
@@ -16,12 +17,16 @@ SUDO = ""
 _SUPPORTED_PLATFORMS = ["linux"]
 _PROCESS: subprocess.Popen = None
 _ENV_PATH = Path(".certbot.env")
+_INSTALL = []
 
 try:
     import boto3
-    BOTO3 = True
 except ImportError:
-    BOTO3 = False
+    _INSTALL.append("boto3")
+try:
+    import requests
+except ImportError:
+    _INSTALL.append("requests")
 
 def _command(command: str) -> str:
     return SUDO+command
@@ -69,8 +74,8 @@ def _check_admin_privileges() -> None:
 def has_certbot():
     return not os.system("command -v certbot > /dev/null")
 
-def install_boto3() -> None:
-    command = _command("su - -c 'python3 -m pip install boto3'")
+def install_package(packages: list) -> None:
+    command = _command(f"su - -c 'python3 -m pip install {' '.join(packages)}'")
     os.system(command)
     print("Please restart this script.")
     exit(2)
@@ -128,6 +133,19 @@ def renew_cert() -> int:
         _PROCESS.wait()
         exit(3)
 
+    update = False
+    while not update:
+        time.sleep(2)
+        rtn = requests.get(f"https://toolbox.googleapps.com/apps/dig/lookup?domain={acme_domain[:-1]}&typ=TXT").json()
+        try:
+            value = rtn["json_response"]["ANSWER"][0]["answer"][0]["value"][0]
+            if value == acme_value:
+                update = True
+        except KeyError:
+            pass
+        except IndexError:
+            pass
+
     _PROCESS.communicate(input="\n".encode("utf-8"))
     return _PROCESS.wait()
 
@@ -139,7 +157,7 @@ def reload_nginx() -> int:
 if __name__ == "__main__":
     _check_platform()
     _check_admin_privileges()
-    if not BOTO3: install_boto3()
+    if _INSTALL: install_package(_INSTALL)
     _get_env()
     try:
         if renew_cert():
